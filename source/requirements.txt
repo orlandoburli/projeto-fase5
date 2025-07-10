@@ -1,0 +1,8 @@
+fastapi[standard]==0.116.0
+uvicorn==0.34.2
+scikit-learn==1.6.1
+pandas==2.2.3
+joblib==1.5.1
+pytest==8.4.1
+requests==2.32.4
+SQLAlchemy==2.0.39
