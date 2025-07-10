@@ -29,8 +29,6 @@ services:
     image: prom/prometheus
     ports:
       - "9090:9090"
-    networks:
-      - recommendation-network
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
@@ -39,8 +37,6 @@ services:
     image: grafana/grafana
     ports:
       - "3000:3000"
-    networks:
-      - recommendation-network
     depends_on:
       - prometheus
     volumes:
@@ -59,3 +55,5 @@ services:
 
 volumes:
   postgres-db-volume:
+  prometheus_data:
+  grafana_data:
