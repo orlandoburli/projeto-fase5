@@ -6,3 +6,5 @@ joblib==1.5.1
 pytest==8.4.1
 requests==2.32.4
 SQLAlchemy==2.0.39
+prometheus-fastapi-instrumentator==1.1.1
+psycopg2-binary==2.9.6
