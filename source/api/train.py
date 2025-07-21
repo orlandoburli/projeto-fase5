@@ -55,6 +55,5 @@ def train_dataset(df: DataFrame, engine: Engine):
     print(classification_report(y_test, y_pred))
 
     # Salvar modelos
-    save_model_to_db(model, "model", engine)
+    save_model_to_db(model, "random_forest_model", engine)
     save_model_to_db(tfidf, "tfidf_vectorizer", engine)
-

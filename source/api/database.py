@@ -68,8 +68,6 @@ def save_model_to_db(model, model_name, engine):
 
 
 def load_model_from_db(model_name, engine):
-    from tensorflow.keras.models import load_model
-
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -80,15 +78,14 @@ def load_model_from_db(model_name, engine):
             .order_by(MLModel.created_at.desc()) \
             .first()
 
-        print(f"Model: ${model_record}")
-
         if model_record is None:
+            print(f"Model not found for {model_name}")
             return None
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as tmp:
             tmp.write(model_record.model_data)
             tmp.flush()
-            model = load_model(tmp.name)
+            model = joblib.load(tmp.name)
             os.unlink(tmp.name)
 
         return model

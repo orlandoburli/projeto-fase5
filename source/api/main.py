@@ -2,13 +2,12 @@ import os
 
 import pandas as pd
 from fastapi import FastAPI
-
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from database import init_db
 from datasets import build_dataset
+from predict import PredictionRequest, predict_candidate
 from train import train_dataset
-
 
 app = FastAPI()
 
@@ -37,3 +36,10 @@ def train():
     df = build_dataset()
     train_dataset(df, engine)
     return {"status": "ok", "details": "Dataset trained successfully!"}
+
+
+@app.post("/predict")
+def predict(data: PredictionRequest):
+    engine = init_db()
+
+    return predict_candidate(data, engine)
