@@ -16,6 +16,9 @@ def train_dataset(df: DataFrame, engine: Engine):
     english_map = {"Nenhum": 0, "Básico": 1, "Intermediário": 2, "Avançado": 3, "Fluente": 4}
     df["english_level_code"] = df["english_level"].map(english_map).fillna(0).astype(int)
 
+    spanish_map = {"Nenhum": 0, "Básico": 1, "Intermediário": 2, "Avançado": 3, "Fluente": 4}
+    df["spanish_level_code"] = df["spanish_level"].map(spanish_map).fillna(0).astype(int)
+
     # Certificações → binário
     df["has_certifications"] = df["certifications"].apply(lambda x: 0 if pd.isna(x) or x.strip() == "" else 1)
 
@@ -32,7 +35,7 @@ def train_dataset(df: DataFrame, engine: Engine):
     # Juntar no dataframe final
     df_model = pd.concat([df.reset_index(drop=True), tfidf_df.reset_index(drop=True)], axis=1)
 
-    # --- 4. Selecionar features ---
+    # Selecionar features
     feature_cols = (
         ["english_level_code", "has_certifications"] +
         [f"kw_{kw}" for kw in keywords] +
@@ -42,18 +45,16 @@ def train_dataset(df: DataFrame, engine: Engine):
     X = df_model[feature_cols]
     y = df_model["target"]
 
-    # --- 5. Treinar modelo ---
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
 
-    # --- 6. Avaliar ---
     y_pred = model.predict(X_test)
     print("\n📊 Classification Report:")
     print(classification_report(y_test, y_pred))
 
-    # --- 7. Salvar modelo e vetorizador ---
+    # Salvar modelos
     save_model_to_db(model, "model", engine)
     save_model_to_db(tfidf, "tfidf_vectorizer", engine)
 
