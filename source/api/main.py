@@ -1,4 +1,5 @@
 import os
+import time
 
 import pandas as pd
 from fastapi import FastAPI
@@ -7,6 +8,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from database import init_db
 from datasets import build_dataset
 from predict import PredictionRequest, predict_candidate
+from metrics import REQUEST_COUNT, REQUEST_LATENCY
 from train import train_dataset
 
 app = FastAPI()
@@ -40,6 +42,14 @@ def train():
 
 @app.post("/predict")
 def predict(data: PredictionRequest):
+    start = time.time()
+    REQUEST_COUNT.inc()
+
     engine = init_db()
 
-    return predict_candidate(data, engine)
+    result = predict_candidate(data, engine)
+
+    duration = time.time() - start
+    REQUEST_LATENCY.observe(duration)
+
+    return result

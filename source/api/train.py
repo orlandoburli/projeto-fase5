@@ -2,11 +2,12 @@ import pandas as pd
 from pandas import DataFrame
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, roc_auc_score, accuracy_score
 from sklearn.model_selection import train_test_split
 from sqlalchemy.engine.base import Engine
 
 from database import save_model_to_db
+from metrics import MODEL_ACCURACY, MODEL_AUC
 
 
 def train_dataset(df: DataFrame, engine: Engine):
@@ -54,6 +55,22 @@ def train_dataset(df: DataFrame, engine: Engine):
     print("\n📊 Classification Report:")
     print(classification_report(y_test, y_pred))
 
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)[:, 1]
+
     # Salvar modelos
     save_model_to_db(model, "random_forest_model", engine)
     save_model_to_db(tfidf, "tfidf_vectorizer", engine)
+
+    acc = accuracy_score(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_prob)
+
+    acc = accuracy_score(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_prob)
+
+    print("Accuracy:", acc)
+    print("AUC:", auc)
+
+    # Atualiza métricas Prometheus
+    MODEL_ACCURACY.set(acc)
+    MODEL_AUC.set(auc)
